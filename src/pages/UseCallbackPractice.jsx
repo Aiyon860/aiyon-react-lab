@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Card, Button, Skeleton, Alert } from "./ui";
+import { Card, Button, Skeleton, Alert } from "../components/ui";
 import { Link } from "react-router";
 
 // Tab Navigation Component
@@ -57,7 +57,7 @@ function PracticeNavigation({ activePractice, setActivePractice }) {
 
 // TodoItem Component with React.memo
 const TodoItem = React.memo(({ id, title, completed, onToggle }) => {
-  console.log("Anak di-render: " + id);
+  console.log("Child rendered: " + id);
   return (
     <div className="flex items-center gap-3 p-3 bg-surface-base border border-border-subtle rounded-lg shadow-sm">
       <input
@@ -98,7 +98,7 @@ function useTodos() {
           { signal },
         );
 
-        if (!response.ok) throw new Error("Gagal mengambil data!");
+        if (!response.ok) throw new Error("Failed to fetch data!");
 
         const data = await response.json();
 
@@ -106,7 +106,7 @@ function useTodos() {
         setError(null);
       } catch (error) {
         if (error.name === "AbortError") {
-          console.log("Fetch dibatalkan: komponen unmount");
+          console.log("Fetch cancelled: component unmount");
         } else {
           setError(error.message);
         }
@@ -172,9 +172,7 @@ function TodoListWithCallback({ todos, isLoading, error }) {
       ) : error ? (
         <Alert type="error">Error: {error}</Alert>
       ) : todos.length === 0 ? (
-        <p className="text-content-tertiary italic">
-          Tidak ada data yang ditemukan.
-        </p>
+        <p className="text-content-tertiary italic">No data found.</p>
       ) : (
         <div className="space-y-2">
           {todos.map((item) => (
@@ -241,9 +239,7 @@ function TodoListWithoutCallback({ todos, isLoading, error }) {
       ) : error ? (
         <Alert type="error">Error: {error}</Alert>
       ) : todos.length === 0 ? (
-        <p className="text-content-tertiary italic">
-          Tidak ada data yang ditemukan.
-        </p>
+        <p className="text-content-tertiary italic">No data found.</p>
       ) : (
         <div className="space-y-2">
           {todos.map((item) => (
@@ -305,7 +301,7 @@ export default function UseCallbackPractice() {
           Demo: useCallback
         </h2>
         <p className="text-content-secondary mt-1">
-          Demo mencegah re-render dengan useCallback.
+          Demo preventing re-renders with useCallback.
         </p>
       </header>
 
@@ -326,7 +322,7 @@ export default function UseCallbackPractice() {
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          Kembali ke Menu
+          Back to Menu
         </Link>
       </div>
 
@@ -343,19 +339,19 @@ export default function UseCallbackPractice() {
         aria-live="polite"
         aria-atomic="true"
       >
-        <p className="sr-only">Log aplikasi:</p>
+        <p className="sr-only">Application log:</p>
         <div>
           <p>
-            // Notes: Buka Console (F12) untuk melihat perbedaan re-render
+            // Notes: Open Console (F12) to see re-render differences in
             TodoItem.
           </p>
           <p>
-            // Dengan useCallback: Klik tombol counter tidak memicu re-render
-            TodoItem karena onToggle stabil.
+            // With useCallback: Clicking counter button does not trigger
+            re-render of TodoItem because onToggle is stable.
           </p>
           <p>
-            // Tanpa useCallback: Klik tombol counter memicu re-render semua
-            TodoItem karena onToggle baru setiap render.
+            // Without useCallback: Clicking counter button triggers re-render
+            of all TodoItem because onToggle is new every render.
           </p>
         </div>
       </Card>

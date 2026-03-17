@@ -2,9 +2,9 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { Card } from "./ui";
+import { Card } from "../components/ui";
 
-// Komponen EditProfile untuk mengedit profil user
+// EditProfile component to edit user profile
 function EditProfile() {
   const { user, setUser } = useContext(UserContext);
 
@@ -114,7 +114,7 @@ export default function UseContextPractice() {
           useContext Demo
         </h1>
         <p className="text-content-secondary max-w-2xl mt-1">
-          Demo penggunaan useContext untuk mengelola state global.
+          Demo of using useContext to manage global state.
         </p>
       </header>
 
@@ -135,7 +135,7 @@ export default function UseContextPractice() {
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          Kembali ke Menu
+          Back to Menu
         </Link>
         <ThemeToggle />
       </div>

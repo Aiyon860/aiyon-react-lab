@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useReducer } from "react";
 import { Link } from "react-router-dom";
-import { Card, Button, Skeleton, Alert } from "./ui";
+import { Card, Button, Skeleton, Alert } from "../components/ui";
 
 function fetchStart(state) {
   return {
@@ -186,14 +186,14 @@ export default function UseReducerPractice() {
         );
 
         if (!response.ok) {
-          throw new Error("Gagal mengambil data");
+          throw new Error("Failed to fetch data");
         }
 
         const data = await response.json();
         dispatch({ type: "FETCH_SUCCESS", payload: data });
       } catch (e) {
         if (e.name === "AbortError") {
-          console.log("Fetch dibatalkan: komponen unmount");
+          console.log("Fetch cancelled: component unmount");
           return;
         } else {
           dispatch({ type: "FETCH_ERROR", payload: e.message });
@@ -213,16 +213,16 @@ export default function UseReducerPractice() {
           useReducer Demo
         </h1>
         <p className="text-content-secondary mt-2 max-w-2xl">
-          Simulasi order checkout di marketplace.
+          Simulating order checkout in a marketplace.
         </p>
         <div className="mt-4 rounded-2xl border border-status-warning/20 bg-status-warning/10 px-4 py-3 text-status-warning">
           <p className="text-sm">
-            Disclaimer: Ini hanya simulasi. Data produk diambil dari{" "}
+            Disclaimer: This is just a simulation. Product data is fetched from{" "}
             <span className="font-medium">
               "https://my-json-server.typicode.com/Aiyon860/fake-api-json/products"
             </span>{" "}
-            dan tidak dimanipulasi secara langsung. Perubahan stok hanya terjadi
-            di state React (misalnya mengurangi/menambah stok di state saja).
+            and is not manipulated directly. Stock changes only occur in React
+            state (e.g., reducing or increasing stock in state only).
           </p>
         </div>
       </header>
@@ -244,36 +244,39 @@ export default function UseReducerPractice() {
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          Kembali ke Menu
+          Back to Menu
         </Link>
       </div>
 
-      {/* Bagian Atas: Daftar Produk */}
+      {/* Top Section: Product List */}
       <Card>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-content-primary">
-            Daftar Produk
+            Product List
           </h2>
           <span className="text-sm text-content-tertiary">
-            Total Produk: {state.products.length}
+            Total Products: {state.products.length}
           </span>
         </div>
         {state.isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="p-4 border border-border-subtle rounded-lg bg-surface-sunken">
               <Skeleton items={[{ height: "h-32" }, { height: "h-4" }]} />
             </div>
             <div className="p-4 border border-border-subtle rounded-lg bg-surface-sunken">
+              <Skeleton items={[{ height: "h-32" }, { height: "h-4" }]} />
+            </div>
+            <div className="p-4 border border-border-subtle rounded-lg bg-surface-sunken lg:block hidden">
               <Skeleton items={[{ height: "h-32" }, { height: "h-4" }]} />
             </div>
           </div>
         ) : state.error ? (
           <Alert type="error">
-            <p className="font-medium">Gagal mengambil data produk.</p>
+            <p className="font-medium">Failed to fetch product data.</p>
             <p className="text-sm mt-1">{state.error}</p>
           </Alert>
         ) : (
-          <ul className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {state.products.map((product) => {
               return (
                 <li key={product.id} className="h-full">
@@ -283,10 +286,10 @@ export default function UseReducerPractice() {
                         {product.name}
                       </p>
                       <p className="text-sm text-content-secondary">
-                        Stok: {product.stock}
+                        Stock: {product.stock}
                       </p>
                       <p className="text-sm text-content-secondary">
-                        Harga: Rp {product.price}
+                        Price: Rp {product.price}
                       </p>
                     </div>
                     <Button
@@ -298,9 +301,7 @@ export default function UseReducerPractice() {
                       variant="primary"
                       className="mt-4"
                     >
-                      {product.stock === 0
-                        ? "Stok Habis"
-                        : "Tambah ke Keranjang"}
+                      {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
                     </Button>
                   </div>
                 </li>
@@ -310,12 +311,10 @@ export default function UseReducerPractice() {
         )}
       </Card>
 
-      {/* Bagian Tengah: Keranjang/Cart */}
+      {/* Middle Section: Cart */}
       <Card>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-content-primary">
-            Keranjang
-          </h2>
+          <h2 className="text-xl font-semibold text-content-primary">Cart</h2>
           <span className="text-sm text-content-tertiary">
             Total Item: {state.cart.length}
           </span>
@@ -323,7 +322,7 @@ export default function UseReducerPractice() {
         <ul className="space-y-3">
           {state.cart.length === 0 ? (
             <p className="text-content-tertiary italic text-sm">
-              Keranjang masih kosong.
+              Cart is still empty.
             </p>
           ) : (
             state.cart.map((product) => {
@@ -347,7 +346,7 @@ export default function UseReducerPractice() {
                         dispatch({ type: "DECREASE_QTY", payload: product.id })
                       }
                       variant="secondary"
-                      aria-label="Kurangi jumlah"
+                      aria-label="Decrease quantity"
                     >
                       -
                     </Button>
@@ -361,7 +360,7 @@ export default function UseReducerPractice() {
                       }
                       variant="danger"
                     >
-                      Hapus
+                      Delete
                     </Button>
                   </div>
                 </li>
@@ -387,11 +386,11 @@ export default function UseReducerPractice() {
         </div>
       </Card>
 
-      {/* Bagian Bawah: Riwayat Order */}
+      {/* Bottom Section: Order History */}
       <Card>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-content-primary">
-            Riwayat Order
+            Order History
           </h2>
           <span className="text-sm text-content-tertiary">
             Total Order: {state.orders.length}
@@ -400,7 +399,7 @@ export default function UseReducerPractice() {
         <div className="space-y-3">
           {state.orders.length === 0 ? (
             <p className="text-content-tertiary italic text-sm">
-              Belum ada riwayat order.
+              No order history yet.
             </p>
           ) : (
             state.orders.map((o) => {
@@ -419,7 +418,7 @@ export default function UseReducerPractice() {
                       </p>
                       {o.isCancelled && (
                         <p className="text-sm text-status-error mt-1 font-medium">
-                          Pesanan ini sudah dicancel.
+                          This order has been cancelled.
                         </p>
                       )}
                     </div>
@@ -431,7 +430,7 @@ export default function UseReducerPractice() {
                         }
                         variant="warning"
                       >
-                        Batalkan Pesanan
+                        Cancel Order
                       </Button>
                     )}
                   </div>

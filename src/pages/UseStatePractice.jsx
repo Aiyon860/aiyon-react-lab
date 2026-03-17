@@ -1,44 +1,20 @@
-import { useRef } from "react";
-import { useEffect } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Card, Button, Skeleton, Alert } from "./ui";
+import { Card, Button } from "../components/ui";
+
+const maxCharCount = 20;
 
 // Tab Navigation Component
 function PracticeNavigation({ activePractice, setActivePractice }) {
   const practices = [
-    { key: "localstorage", label: "LocalStorage" },
-    {
-      key: "api",
-      label: (
-        <span className="inline-flex items-center gap-1">
-          API Fetch
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-3.5 w-3.5"
-          >
-            <path d="M5 12a7 7 0 0 1 14 0" />
-            <path d="M8.5 12a3.5 3.5 0 0 1 7 0" />
-            <path d="M12 16h.01" />
-          </svg>
-        </span>
-      ),
-    },
-    { key: "timer", label: "Timer" },
-    { key: "listener", label: "Event Listener" },
+    { key: "character", label: "Character Counter" },
+    { key: "calculator", label: "Calculator" },
+    { key: "counter", label: "Counter" },
+    { key: "todo", label: "Todo List" },
   ];
 
   return (
-    <nav
-      className="border-b border-border-subtle mb-6"
-      aria-label="Practice Tabs"
-    >
+    <nav className="border-b border-border-subtle mb-6" aria-label="Demo Tabs">
       <ul className="flex">
         {practices.map((practice) => (
           <li key={practice.key} className="flex-1">
@@ -59,28 +35,232 @@ function PracticeNavigation({ activePractice, setActivePractice }) {
   );
 }
 
-// LocalStorage Component - Persisting Data
-function LocalStorageExample() {
-  const [todos, setTodos] = useState(() => {
-    const saved = localStorage.getItem("my_todos");
-    try {
-      return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.error("Gagal memuat data:", error);
-      return [];
+// Character Counter Component
+function CharacterCounter() {
+  const [charCount, setCharCount] = useState(0);
+  const isOverLimit = charCount > maxCharCount;
+
+  return (
+    <div className="w-full space-y-2">
+      <div className="flex justify-between items-end">
+        <label
+          htmlFor="message"
+          className="text-sm font-bold text-content-primary uppercase tracking-wider"
+        >
+          Short Message
+        </label>
+        <span
+          aria-live="polite"
+          className={`text-xs font-mono ${isOverLimit ? "text-status-error font-bold" : "text-content-tertiary"}`}
+        >
+          {charCount} / {maxCharCount}
+        </span>
+      </div>
+      <input
+        id="message"
+        type="text"
+        className={`w-full px-4 py-2 bg-surface-base border rounded-lg transition-all outline-none text-content-primary
+          ${
+            isOverLimit
+              ? "border-status-error ring-2 ring-status-error/20 focus-visible:ring-status-error focus-visible:border-status-error"
+              : "border-border-default focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
+          }`}
+        aria-invalid={isOverLimit}
+        aria-describedby="message-error"
+        onChange={(e) => setCharCount(e.target.value.length)}
+      />
+      <div className="min-h-7">
+        {isOverLimit && (
+          <p
+            id="message-error"
+            className="text-xs text-status-error flex items-center gap-1 animate-in fade-in slide-in-from-top-1"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="size-3"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Maximum limit is {maxCharCount} characters!
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Simple Calculator Component
+function SimpleCalculator() {
+  const [num1, setNum1] = useState(0);
+  const [num2, setNum2] = useState(0);
+  const [operator, setOperator] = useState("+");
+  const isError = operator === "/" && num2 === 0;
+
+  let result;
+  if (!isError) {
+    switch (operator) {
+      case "+":
+        result = num1 + num2;
+        break;
+      case "-":
+        result = num1 - num2;
+        break;
+      case "*":
+        result = num1 * num2;
+        break;
+      case "/":
+        result = num1 / num2;
+        break;
+      default:
+        result = 0;
     }
-  });
+  }
 
-  useEffect(() => {
-    localStorage.setItem("my_todos", JSON.stringify(todos));
-  }, [todos]);
+  return (
+    <div className="w-full py-8 border-t border-border-subtle space-y-4">
+      <header>
+        <h3 className="text-sm font-bold text-content-primary uppercase tracking-wider">
+          Simple Calculator
+        </h3>
+      </header>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          aria-label="First number"
+          placeholder="0"
+          className="w-full px-3 py-2 bg-surface-base border border-border-default rounded-lg text-content-primary focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          onChange={(e) => setNum1(Number(e.target.value))}
+        />
+        <select
+          aria-label="Select operation"
+          className="px-2 py-2 bg-surface-sunken border border-border-default rounded-lg text-content-primary focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          onChange={(e) => setOperator(e.target.value)}
+        >
+          <option value="+">+</option>
+          <option value="-">-</option>
+          <option value="*">×</option>
+          <option value="/">÷</option>
+        </select>
+        <input
+          type="number"
+          aria-label="Second number"
+          placeholder="0"
+          className="w-full px-3 py-2 bg-surface-base border border-border-default rounded-lg text-content-primary focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          onChange={(e) => setNum2(Number(e.target.value))}
+        />
+      </div>
+      <div
+        className={`p-4 rounded-xl border text-center transition-all ${
+          isError
+            ? "bg-status-error/10 border-status-error/20"
+            : "bg-brand-primary/10 border-brand-primary/20"
+        }`}
+        aria-live="polite"
+      >
+        {isError ? (
+          <p className="text-sm text-status-error font-medium flex items-center justify-center gap-2">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+            >
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+              <path d="M10.3 3.6 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3l-8.1-14.4a2 2 0 0 0-3.4 0Z" />
+            </svg>
+            Cannot divide by zero!
+          </p>
+        ) : (
+          <p className="text-sm text-brand-primary font-medium">
+            Result: <span className="text-xl font-bold">{result}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
-  const inputAddRef = useRef(null);
+// Counter Component
+function Counter() {
+  const [count, setCount] = useState(0);
 
-  useEffect(() => {
-    inputAddRef.current?.focus();
-  }, []);
+  const handleIncrement = () => {
+    setCount((prevCount) => prevCount + 1);
+  };
 
+  const handleDecrement = () => {
+    setCount((prevCount) => (prevCount > 0 ? prevCount - 1 : 0));
+  };
+
+  const handleReset = () => {
+    setCount(0);
+  };
+
+  return (
+    <div className="w-full py-8 border-t border-border-subtle space-y-4">
+      <header>
+        <h3 className="text-sm font-bold text-content-primary uppercase tracking-wider">
+          Increment & Decrement Counter
+        </h3>
+        <p className="text-xs text-content-tertiary">
+          Functional Update & Number Limitation Demo
+        </p>
+      </header>
+      <div className="flex flex-col items-center bg-surface-sunken p-6 rounded-2xl border border-border-subtle gap-6">
+        <div
+          className="text-6xl font-black text-brand-primary tabular-nums"
+          aria-live="polite"
+        >
+          {count}
+        </div>
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={handleDecrement}
+            aria-label="Decrease number"
+            variant="secondary"
+            className="size-12 flex items-center justify-center text-2xl font-bold"
+          >
+            −
+          </Button>
+          <Button
+            onClick={handleReset}
+            variant="secondary"
+            className="px-6 py-2 font-semibold"
+          >
+            Reset
+          </Button>
+          <Button
+            onClick={handleIncrement}
+            aria-label="Increase number"
+            variant="primary"
+            className="size-12 flex items-center justify-center text-2xl font-bold"
+          >
+            +
+          </Button>
+        </div>
+        <p className="text-[10px] text-content-tertiary text-center uppercase tracking-widest">
+          Tip: Try using functional update{" "}
+          <code className="text-content-secondary">(prev) =&gt; prev + 1</code>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// TodoList Component
+function TodoList() {
+  const [todos, setTodos] = useState([]);
   const [addText, setAddText] = useState("");
   const [isInputError, setIsInputError] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -149,10 +329,10 @@ function LocalStorageExample() {
     <div className="w-full pt-8 border-t border-border-subtle space-y-4">
       <header>
         <h3 className="text-sm font-bold text-content-primary uppercase tracking-wider">
-          LocalStorage Example
+          Simple Todo List
         </h3>
         <p className="text-xs text-content-secondary">
-          Demo persistensi data dengan localStorage dan useEffect.
+          Demo CRUD: Create, Read, Update, Delete
         </p>
       </header>
       <div className="space-y-4">
@@ -168,8 +348,7 @@ function LocalStorageExample() {
             onKeyDown={(e) => {
               if (e.key === "Enter") addTodo();
             }}
-            ref={inputAddRef}
-            placeholder="Apa yang ingin dikerjakan?"
+            placeholder="What needs to be done?"
             className={`w-full px-4 py-2 bg-surface-base border rounded-lg transition-all outline-none focus-visible:ring-2 text-content-primary
               ${
                 isInputError
@@ -184,7 +363,7 @@ function LocalStorageExample() {
             variant="primary"
             className="px-4 py-2 font-bold"
           >
-            Tambah
+            Add
           </Button>
         </div>
         <div className="min-h-5">
@@ -205,14 +384,14 @@ function LocalStorageExample() {
                   clipRule="evenodd"
                 />
               </svg>
-              Ups! Tugas tidak boleh kosong.
+              Oops! Task cannot be empty.
             </p>
           )}
         </div>
-        <ul className="space-y-3" aria-label="Daftar tugas">
+        <ul className="space-y-3" aria-label="Task list">
           {todos.length === 0 ? (
             <p className="text-center text-content-tertiary py-6 italic text-sm">
-              Belum ada tugas hari ini...
+              No tasks for today...
             </p>
           ) : (
             todos.map((todo) => {
@@ -249,14 +428,14 @@ function LocalStorageExample() {
                       variant="primary"
                       className="px-3 py-1 text-xs font-bold"
                     >
-                      Simpan
+                      Save
                     </Button>
                     <Button
                       onClick={cancelEdit}
                       variant="secondary"
                       className="px-3 py-1 text-xs font-bold"
                     >
-                      Batal
+                      Cancel
                     </Button>
                   </div>
                   {editErrorId === todo.id && (
@@ -276,7 +455,7 @@ function LocalStorageExample() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Teks edit tidak boleh kosong!
+                      Edit text cannot be empty!
                     </p>
                   )}
                 </li>
@@ -290,7 +469,6 @@ function LocalStorageExample() {
                       type="checkbox"
                       className="size-5 rounded border-border-default text-brand-primary focus:ring-brand-primary cursor-pointer"
                       onChange={() => toggleStatus(todo.id)}
-                      checked={todo.isCompleted}
                     />
                     <span
                       className={`transition-all duration-50 ${
@@ -300,7 +478,9 @@ function LocalStorageExample() {
                       }`}
                     >
                       <span className="sr-only">
-                        {todo.isCompleted ? "Tugas selesai: " : "Tugas aktif: "}
+                        {todo.isCompleted
+                          ? "Task completed: "
+                          : "Active task: "}
                       </span>
                       {todo.text}
                     </span>
@@ -318,7 +498,7 @@ function LocalStorageExample() {
                       variant="danger"
                       className="p-2 text-xs font-semibold"
                     >
-                      Hapus
+                      Delete
                     </Button>
                   </div>
                 </li>
@@ -331,255 +511,22 @@ function LocalStorageExample() {
   );
 }
 
-// Timer Component - Countdown Timer
-function TimerExample() {
-  const initialSeconds = 10;
-
-  const [seconds, setSeconds] = useState(initialSeconds);
-  const [isActive, setIsActive] = useState(false);
-
-  // imperative
-  const intervalId = useRef(null);
-
-  useEffect(() => {
-    return () => clearInterval(intervalId.current);
-  }, []);
-
-  useEffect(() => {
-    document.title = `Timer: ${seconds}s | React Hooks Playground`;
-  }, [seconds]);
-
-  useEffect(() => {
-    return () => {
-      document.title = "useEffect | React Hooks Playground";
-    };
-  }, []);
-
-  const startTimer = () => {
-    if (intervalId.current) {
-      clearInterval(intervalId.current);
-    }
-
-    setIsActive(true);
-    intervalId.current = setInterval(
-      () =>
-        setSeconds((prev) => {
-          if (prev <= 1) {
-            setIsActive(false);
-            clearInterval(intervalId.current);
-            return 0;
-          }
-          return prev - 1;
-        }),
-      1000,
-    );
-  };
-
-  const pauseTimer = () => {
-    setIsActive(false);
-    clearInterval(intervalId.current);
-  };
-
-  const resetTimer = () => {
-    setIsActive(false);
-    setSeconds(initialSeconds);
-    clearInterval(intervalId.current);
-  };
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-content-primary">
-        Timer Example
-      </h3>
-      <div className="text-center">
-        <div className="text-4xl font-mono mb-4 text-content-primary">
-          {seconds}s
-        </div>
-        <div className="flex gap-2 justify-center">
-          <Button
-            onClick={!isActive ? startTimer : pauseTimer}
-            variant="primary"
-            className="px-4 py-2"
-          >
-            {!isActive ? "Start" : "Pause"}
-          </Button>
-          <Button
-            onClick={resetTimer}
-            variant="secondary"
-            className="px-4 py-2"
-          >
-            Reset
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// API Fetch Component - Template for Fetching Data
-function FetchAPIExample() {
-  const [todos, setTodos] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    async function fetchData() {
-      setIsLoading(true);
-
-      try {
-        const response = await fetch(
-          "https://jsonplaceholder.typicode.com/todos?_limit=5",
-          { signal },
-        );
-
-        if (!response.ok) throw new Error("Gagal mengambil data!");
-
-        const data = await response.json();
-
-        setTodos(data);
-        setError(null);
-      } catch (error) {
-        if (error.name === "AbortError") {
-          console.log("Fetch dibatalkan: komponen unmount");
-          return;
-        } else {
-          setError(error.message);
-        }
-      } finally {
-        if (!signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    fetchData();
-
-    return () => controller.abort();
-  }, []);
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-content-primary">
-        API Fetch Example
-      </h3>
-
-      {isLoading ? (
-        <div role="status" aria-live="polite" className="space-y-2">
-          <Skeleton
-            items={[
-              {
-                height: "h-12",
-                className:
-                  "rounded-lg border border-border-subtle bg-surface-sunken",
-              },
-              {
-                height: "h-12",
-                className:
-                  "rounded-lg border border-border-subtle bg-surface-sunken",
-              },
-              {
-                height: "h-12",
-                className:
-                  "rounded-lg border border-border-subtle bg-surface-sunken",
-              },
-            ]}
-          />
-        </div>
-      ) : error ? (
-        <Alert type="error">Error: {error}</Alert>
-      ) : todos.length === 0 ? (
-        <p className="text-content-tertiary italic">
-          Tidak ada data yang ditemukan.
-        </p>
-      ) : (
-        <div className="space-y-2">
-          {todos.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center gap-3 p-3 bg-surface-base border border-border-subtle rounded-lg shadow-sm"
-            >
-              <input
-                type="checkbox"
-                checked={item.completed}
-                readOnly
-                className="size-4 rounded border-border-default text-brand-primary focus:ring-brand-primary"
-              />
-              <span
-                className={`flex-1 ${
-                  item.completed
-                    ? "text-content-tertiary line-through"
-                    : "text-content-primary"
-                }`}
-              >
-                {item.title}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Event Listener Component - Static UI Placeholder
-function ListenerExample() {
-  const [coord, setCoord] = useState({ x: null, y: null });
-
-  const isThrottled = useRef(false);
-
-  useEffect(() => {
-    let timeoutId = null;
-
-    const handleMouseMove = (event) => {
-      if (isThrottled.current) return;
-
-      setCoord({ x: event.clientX, y: event.clientY });
-      isThrottled.current = true;
-
-      timeoutId = setTimeout(() => {
-        isThrottled.current = false;
-      }, 100);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, []);
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-content-primary">
-        Event Listener Example
-      </h3>
-      <p className="text-content-secondary">
-        Mouse position: X: {coord.x}, Y: {coord.y}
-      </p>
-    </div>
-  );
-}
-
 // Main Component
-export default function UseEffectPractice() {
-  const [activePractice, setActivePractice] = useState("localstorage");
+export default function UseStatePractice() {
+  const [activePractice, setActivePractice] = useState("character");
 
   const renderActivePractice = () => {
     switch (activePractice) {
-      case "localstorage":
-        return <LocalStorageExample />;
-      case "api":
-        return <FetchAPIExample />;
-      case "timer":
-        return <TimerExample />;
-      case "listener":
-        return <ListenerExample />;
+      case "character":
+        return <CharacterCounter />;
+      case "calculator":
+        return <SimpleCalculator />;
+      case "counter":
+        return <Counter />;
+      case "todo":
+        return <TodoList />;
       default:
-        return <LocalStorageExample />;
+        return <CharacterCounter />;
     }
   };
 
@@ -590,10 +537,10 @@ export default function UseEffectPractice() {
           id="practice-heading"
           className="text-3xl font-semibold tracking-tight text-content-primary"
         >
-          Demo: useEffect
+          Demo: useState
         </h2>
         <p className="text-content-secondary mt-1">
-          Mengelola side-effects, fetch API, dan cleanup.
+          Managing reactive data within components.
         </p>
       </header>
 
@@ -614,7 +561,7 @@ export default function UseEffectPractice() {
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          Kembali ke Menu
+          Back to Menu
         </Link>
       </div>
 
@@ -631,10 +578,8 @@ export default function UseEffectPractice() {
         aria-live="polite"
         aria-atomic="true"
       >
-        <p className="sr-only">Log aplikasi:</p>
-        <p>
-          // Output state atau console bisa dirender di sini untuk visualisasi
-        </p>
+        <p className="sr-only">Application log:</p>
+        <p>// State output or console can be rendered here for visualization</p>
       </Card>
     </article>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Card, Button, Skeleton, Alert } from "./ui";
+import { Card, Button, Skeleton, Alert } from "../components/ui";
 
 // Tab Navigation Component
 function PracticeNavigation({ activePractice, setActivePractice }) {
@@ -74,7 +74,7 @@ function useTodos() {
           { signal },
         );
 
-        if (!response.ok) throw new Error("Gagal mengambil data!");
+        if (!response.ok) throw new Error("Failed to fetch data!");
 
         const data = await response.json();
 
@@ -82,7 +82,7 @@ function useTodos() {
         setError(null);
       } catch (error) {
         if (error.name === "AbortError") {
-          console.log("Fetch dibatalkan: komponen unmount");
+          console.log("Fetch cancelled: component unmount");
         } else {
           setError(error.message);
         }
@@ -105,7 +105,7 @@ function SearchFilterWithMemo({ todos, isLoading, error }) {
   const [count, setCount] = useState(0);
 
   const filteredTodos = useMemo(() => {
-    console.log("Memo: Filtered todos dihitung ulang");
+    console.log("Memo: Filtered todos recalculated");
     return todos.filter((todo) =>
       todo.title.toLowerCase().includes(searchTerm.toLowerCase()),
     );
@@ -130,7 +130,7 @@ function SearchFilterWithMemo({ todos, isLoading, error }) {
 
       <input
         type="text"
-        placeholder="Cari berdasarkan title..."
+        placeholder="Search by title..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full px-4 py-2 border border-border-default rounded-lg bg-surface-base text-content-primary placeholder-content-tertiary focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:outline-none"
@@ -159,9 +159,7 @@ function SearchFilterWithMemo({ todos, isLoading, error }) {
       ) : error ? (
         <Alert type="error">Error: {error}</Alert>
       ) : filteredTodos.length === 0 ? (
-        <p className="text-content-tertiary italic">
-          Tidak ada data yang ditemukan.
-        </p>
+        <p className="text-content-tertiary italic">No data found.</p>
       ) : (
         <div className="space-y-2">
           {filteredTodos.map((item) => (
@@ -199,7 +197,7 @@ function SearchFilterWithoutMemo({ todos, isLoading, error }) {
 
   // Without useMemo, this recalculates on every render
   const filteredTodos = (() => {
-    console.log("Without Memo: Filtered todos dihitung ulang");
+    console.log("Without Memo: Filtered todos recalculated");
     return todos.filter((todo) =>
       todo.title.toLowerCase().includes(searchTerm.toLowerCase()),
     );
@@ -224,7 +222,7 @@ function SearchFilterWithoutMemo({ todos, isLoading, error }) {
 
       <input
         type="text"
-        placeholder="Cari berdasarkan title..."
+        placeholder="Search by title..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full px-4 py-2 border border-border-default rounded-lg bg-surface-base text-content-primary placeholder-content-tertiary focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:outline-none"
@@ -253,9 +251,7 @@ function SearchFilterWithoutMemo({ todos, isLoading, error }) {
       ) : error ? (
         <Alert type="error">Error: {error}</Alert>
       ) : filteredTodos.length === 0 ? (
-        <p className="text-content-tertiary italic">
-          Tidak ada data yang ditemukan.
-        </p>
+        <p className="text-content-tertiary italic">No data found.</p>
       ) : (
         <div className="space-y-2">
           {filteredTodos.map((item) => (
@@ -330,7 +326,7 @@ export default function UseMemoPractice() {
           Demo: useMemo
         </h2>
         <p className="text-content-secondary mt-1">
-          Demo optimasi performa dengan useMemo.
+          Demo performance optimization with useMemo.
         </p>
       </header>
 
@@ -351,7 +347,7 @@ export default function UseMemoPractice() {
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          Kembali ke Menu
+          Back to Menu
         </Link>
       </div>
 
@@ -368,18 +364,18 @@ export default function UseMemoPractice() {
         aria-live="polite"
         aria-atomic="true"
       >
-        <p className="sr-only">Log aplikasi:</p>
+        <p className="sr-only">Application log:</p>
         <div>
-          <p>// Notes: Buka Console (F12) untuk melihat perbedaan.</p>
+          <p>// Notes: Open Console (F12) to see the difference.</p>
           <p>
-            // Dengan useMemo: Klik tombol counter tidak memicu console.log
-            "Memo: Filtered todos dihitung ulang" karena filteredTodos tidak
-            di-recalculate.
+            // With useMemo: Clicking counter button does not trigger
+            console.log "Memo: Filtered todos recalculated" because
+            filteredTodos is not recalculated.
           </p>
           <p>
-            // Tanpa useMemo: Klik tombol counter memicu console.log "Without
-            Memo: Filtered todos dihitung ulang" karena setiap render menghitung
-            ulang filteredTodos.
+            // Without useMemo: Clicking counter button triggers console.log
+            "Without Memo: Filtered todos recalculated" because every render
+            recalculates filteredTodos.
           </p>
         </div>
       </Card>
